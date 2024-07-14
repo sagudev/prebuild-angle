@@ -8,6 +8,8 @@ on:
 jobs:
   win:
     runs-on: windows-latest
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -17,7 +19,7 @@ jobs:
       - run: |
           mkdir angle
           cd angle
-          fetch angle --no-history
+          fetch --no-history angle
       - run: gn gen out/Release
         working-directory: angle
       - run: autoninja -C out/Release
