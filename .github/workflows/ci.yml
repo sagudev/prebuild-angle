@@ -33,7 +33,7 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: gn gen out/Release
+      - run: gn gen out/Release --args='angle_build_all=false angle_build_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false'
         working-directory: angle
       - run: autoninja -C out/Release
         working-directory: angle
