@@ -37,6 +37,7 @@ jobs:
           mkdir out
           cd out
           mkdir Release
+          cd Release
           cp ../../args.gn args.gn
       - run: gn gen out/Release
         working-directory: angle
