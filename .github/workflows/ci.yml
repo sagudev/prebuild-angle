@@ -5,6 +5,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  BRANCH: 6533
+  COMMIT: 108a8f8065c4d9a47be5e12ddae3467136bc7fe2
+
 jobs:
   win:
     runs-on: windows-latest
@@ -12,16 +16,21 @@ jobs:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      #- uses: actions/checkout@v4
       - name: Install Depot Tools
-        uses: newkdev/setup-depot-tools@v1.0.1
+        uses: newkdev/setup-depot-tools@v1
       - run: |
-          mkdir angle
+          git clone --depth=2 -b ${{ env.BRANCH }} https://chromium.googlesource.com/angle/angle
           cd angle
-          fetch --no-history angle
+          git checkout ${{ env.COMMIT }}
+          gclient sync
       - run: gn gen out/Release
         working-directory: angle
       - run: autoninja -C out/Release
         working-directory: angle
-      
+      - uses: actions/upload-artifact@v4
+        with:
+          path: |
+            angle/out/Release/*.dll
+            angle/out/Release/*.dll.*
+            angle/out/Release/vk_swiftshader_icd.json
+            angle/out/Release/angledata
