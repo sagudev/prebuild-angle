@@ -56,7 +56,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
-          path: ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}*
+          path: angle/out/Release/ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}*
       - uses: actions/upload-artifact@v4
         with:
           name: all-ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
