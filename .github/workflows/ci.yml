@@ -10,8 +10,16 @@ env:
   COMMIT: 108a8f8065c4d9a47be5e12ddae3467136bc7fe2
 
 jobs:
-  win:
-    runs-on: windows-latest
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - { target: aarch64-apple-darwin, os: macos-14 }
+          - { target: x86_64-apple-darwin, os: macos-13 }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+    runs-on: ${{ matrix.platform.os }}
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
@@ -24,15 +32,34 @@ jobs:
           cp .gclient angle/.gclient
           cd angle
           git checkout ${{ env.COMMIT }}
-          gclient sync
+          gclient sync --no-history
       - run: gn gen out/Release
         working-directory: angle
       - run: autoninja -C out/Release
         working-directory: angle
       - uses: actions/upload-artifact@v4
+        if: ${{ contains(matrix.platform.os, 'windows') }}
         with:
+          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
           path: |
             angle/out/Release/*.dll
             angle/out/Release/*.dll.*
+            angle/out/Release/vk_swiftshader_icd.json
+            angle/out/Release/angledata
+      - uses: actions/upload-artifact@v4
+        if: ${{ contains(matrix.platform.os, 'ubuntu') }}
+        with:
+          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
+          path: |
+            angle/out/Release/*.so
+            angle/out/Release/vk_swiftshader_icd.json
+            angle/out/Release/angledata
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ contains(matrix.platform.os, 'mac') }}
+        with:
+          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
+          path: |
+            angle/out/Release/*.dylib
             angle/out/Release/vk_swiftshader_icd.json
             angle/out/Release/angledata
