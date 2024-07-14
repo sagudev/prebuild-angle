@@ -7,7 +7,7 @@ on:
 
 env:
   BRANCH: chromium/6533
-  COMMIT: 108a8f8065c4d9a47be5e12ddae3467136bc7fe2
+  COMMIT: 108a8f8
 
 jobs:
   build:
@@ -33,33 +33,58 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false'
+      - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false use_custom_libcxx=false'
         working-directory: angle
       - run: autoninja -C out/Release
         working-directory: angle
-      - uses: actions/upload-artifact@v4
+      - name: Package windows
         if: ${{ contains(matrix.platform.os, 'windows') }}
-        with:
-          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
-          path: |
-            angle/out/Release/*.dll
-            angle/out/Release/*.dll.*
-            angle/out/Release/vk_swiftshader_icd.json
-            angle/out/Release/angledata
-      - uses: actions/upload-artifact@v4
+        working-directory: angle/out/Release
+        run: |
+          7z a ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}-dynamic.zip libEGL.dll libGLESv2.dll
+          7z a ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}-static.zip libEGL.dll.lib libGLESv2.dll.lib
+      - name: Package linux
         if: ${{ contains(matrix.platform.os, 'ubuntu') }}
-        with:
-          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
-          path: |
-            angle/out/Release/*.so
-            angle/out/Release/vk_swiftshader_icd.json
-            angle/out/Release/angledata
-
-      - uses: actions/upload-artifact@v4
+        working-directory: angle/out/Release
+        run: |
+          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.so libGLESv2.so
+      - name: Package mac
         if: ${{ contains(matrix.platform.os, 'mac') }}
+        working-directory: angle/out/Release
+        run: |
+          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.dylib libGLESv2.dylib
+      - uses: actions/upload-artifact@v4
         with:
-          name: ANGLE-${{ matrix.platform.target }}-${{ env.COMMIT }}
+          name: ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
+          path: ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: all-ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
           path: |
-            angle/out/Release/*.dylib
-            angle/out/Release/vk_swiftshader_icd.json
-            angle/out/Release/angledata
+            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll' }}
+            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll.*' }}
+            ${{ contains(matrix.platform.os, 'ubuntu') && 'angle/out/Release/*.so' }}
+            ${{ contains(matrix.platform.os, 'mac') && 'angle/out/Release/*.dylib' }}
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ANGLE-${{ env.COMMIT }}-*
+          merge-multiple: true
+      - name: Publish release if tag doesn't exist
+        id: check-tag
+        run: |
+          RELEASE_TAG="angle-${{ env.COMMIT }}""
+          git fetch --tags --quiet
+          if ! git show-ref --tags --verify --quiet "refs/tags/${RELEASE_TAG}" ; then
+            gh release create ${RELEASE_TAG} ./*.zip
+          fi
+          echo "RELEASE_TAG=${RELEASE_TAG}" >> ${GITHUB_OUTPUT}
+    outputs:
+      release-tag: ${{ steps.check-tag.outputs.RELEASE_TAG }}
