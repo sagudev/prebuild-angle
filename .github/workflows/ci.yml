@@ -80,10 +80,10 @@ jobs:
       - name: Publish release if tag doesn't exist
         id: check-tag
         run: |
-          RELEASE_TAG="angle-${{ env.COMMIT }}""
+          RELEASE_TAG="angle-${{ env.COMMIT }}"
           git fetch --tags --quiet
           if ! git show-ref --tags --verify --quiet "refs/tags/${RELEASE_TAG}" ; then
-            gh release create ${RELEASE_TAG} *.zip
+            gh release create ${RELEASE_TAG} ./*.zip
           fi
           echo "RELEASE_TAG=${RELEASE_TAG}" >> ${GITHUB_OUTPUT}
     outputs:
