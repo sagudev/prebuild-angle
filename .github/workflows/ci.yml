@@ -33,14 +33,9 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: |
-          mkdir out
-          cd out
-          mkdir Release
-          cd Release
-          cp ../../args.gn args.gn
       - run: gn gen out/Release
         working-directory: angle
+      - run: cp args.gn angle/out/Release/args.gn
       - run: autoninja -C out/Release
         working-directory: angle
       - uses: actions/upload-artifact@v4

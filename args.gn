@@ -5,7 +5,6 @@ angle_enable_null=false
 angle_enable_wgpu=false
 angle_enable_swiftshader=false
 angle_enable_vulkan = false
-# make sure some things are true for servo
 angle_enable_apple_translator_workarounds = true
 angle_enable_essl = true
 angle_enable_glsl = true
