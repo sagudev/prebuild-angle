@@ -33,7 +33,7 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false use_custom_libcxx=false'
+      - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false use_custom_libcxx=false angle_has_frame_capture=false'
         working-directory: angle
       - run: autoninja -C out/Release
         working-directory: angle
@@ -61,10 +61,10 @@ jobs:
         with:
           name: all-ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
           path: |
-            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll' }}
-            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll.*' }}
-            ${{ contains(matrix.platform.os, 'ubuntu') && 'angle/out/Release/*.so' }}
-            ${{ contains(matrix.platform.os, 'mac') && 'angle/out/Release/*.dylib' }}
+            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll' || '' }}
+            ${{ contains(matrix.platform.os, 'windows') && 'angle/out/Release/*.dll.*' || '' }}
+            ${{ contains(matrix.platform.os, 'ubuntu') && 'angle/out/Release/*.so' || '' }}
+            ${{ contains(matrix.platform.os, 'mac') && 'angle/out/Release/*.dylib' || '' }}
 
   publish:
     runs-on: ubuntu-latest
