@@ -21,6 +21,7 @@ jobs:
         uses: newkdev/setup-depot-tools@v1.0.1
       - run: |
           git clone --depth=2 -b ${{ env.BRANCH }} https://chromium.googlesource.com/angle/angle
+          cp .gclient angle/.gclient
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync
