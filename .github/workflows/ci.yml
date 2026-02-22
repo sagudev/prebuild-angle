@@ -33,7 +33,31 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false build_angle_deqp_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false use_custom_libcxx=false angle_has_frame_capture=false angle_enable_glsl=true angle_enable_essl=true angle_enable_apple_translator_workarounds=true angle_enable_abseil=false angle_enable_share_context_lock=true is_component_build=false'
+      - run: |
+          gn gen out/Release --args='
+            is_debug=false
+            angle_build_all=false
+            angle_build_tests=false
+            build_angle_deqp_tests=false
+            angle_enable_null=false
+            angle_enable_wgpu=false
+            angle_enable_swiftshader=false
+            angle_enable_vulkan=false
+            use_custom_libcxx=false
+            angle_has_frame_capture=false
+            angle_enable_glsl=true
+            angle_enable_essl=true
+            angle_enable_apple_translator_workarounds=true
+            angle_enable_abseil=false
+            angle_enable_share_context_lock=true
+            treat_warnings_as_errors = false
+            cflags = [
+              "-Wno-unsafe-buffer-usage",
+            ]
+            cflags_cc = [
+              "-Wno-unsafe-buffer-usage",
+            ]
+            is_component_build=false'
         working-directory: angle
       - run: autoninja -C out/Release angle
         working-directory: angle
