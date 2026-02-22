@@ -7,7 +7,7 @@ on:
 
 env:
   BRANCH: main
-  COMMIT: d34c2bf3ce62f1cb24d3cd8f9df69aaf54c97d49
+  COMMIT: 6a7978ce7708d2a7a28ee09fc43461d79d566e7e
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { target: aarch64-apple-darwin, os: macos-14 }
+          - { target: aarch64-apple-darwin, os: macos-15 }
           - { target: x86_64-apple-darwin, os: macos-15-intel }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
           - { target: x86_64-pc-windows-msvc, os: windows-latest }
@@ -35,9 +35,10 @@ jobs:
           gclient sync --no-history
       - run: gn gen out/Release --args='is_debug=false angle_build_all=false angle_build_tests=false build_angle_deqp_tests=false angle_enable_null=false angle_enable_wgpu=false angle_enable_swiftshader=false angle_enable_vulkan=false use_custom_libcxx=false angle_has_frame_capture=false angle_enable_glsl=true angle_enable_essl=true angle_enable_apple_translator_workarounds=true angle_enable_abseil=false angle_enable_share_context_lock=true is_component_build=false'
         working-directory: angle
-      - run: autoninja -C out/Release angle angle_shader_translator
+      - run: autoninja -C out/Release angle
         working-directory: angle
-      - run: tree angle/out/Release
+      - shell: bash
+        run: tree angle/out/Release
       - name: Package windows
         if: ${{ contains(matrix.platform.os, 'windows') }}
         working-directory: angle/out/Release
