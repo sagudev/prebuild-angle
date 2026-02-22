@@ -38,6 +38,8 @@ jobs:
       - run: autoninja -C out/Release angle
         working-directory: angle
       - shell: bash
+        run: ls -la angle/out/Release
+      - shell: bash
         run: tree angle/out/Release
       - name: Package windows
         if: ${{ contains(matrix.platform.os, 'windows') }}
