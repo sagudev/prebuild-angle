@@ -55,10 +55,10 @@ jobs:
             is_component_build=false'
       - run: autoninja -C out/Release angle angle_static
         working-directory: angle
-      - run: autoninja -C out/Release angle_static
-        working-directory: angle
       - shell: bash
         run: ls -la angle/out/Release
+      - shell: bash
+        run: ls -la angle/out/Release/obj
       - name: Package windows
         if: ${{ contains(matrix.platform.os, 'windows') }}
         working-directory: angle/out/Release
