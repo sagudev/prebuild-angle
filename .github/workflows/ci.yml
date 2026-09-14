@@ -59,7 +59,7 @@ jobs:
             ]
             is_component_build=false'
         working-directory: angle
-      - run: autoninja -C out/Release angle
+      - run: autoninja -C out/Release angle angle_static
         working-directory: angle
       - shell: bash
         run: ls -la angle/out/Release
@@ -67,7 +67,7 @@ jobs:
         if: ${{ contains(matrix.platform.os, 'windows') }}
         working-directory: angle/out/Release
         run: |
-          7z a ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.dll libGLESv2.dll libEGL.dll.lib libGLESv2.dll.lib
+          7z a ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.dll libGLESv1_CM.dll libGLESv2.dll libEGL.dll.lib libGLESv1_CM.dll.lib libGLESv2.dll.lib
       - name: Package linux
         if: ${{ contains(matrix.platform.os, 'ubuntu') }}
         working-directory: angle/out/Release
