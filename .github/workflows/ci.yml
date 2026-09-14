@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  BRANCH: chromium/7699
-  COMMIT: 6a7978ce7708d2a7a28ee09fc43461d79d566e7e
+  BRANCH: chromium/7559
+  COMMIT: 4b35b508280d5dfb26cfee4d4b1238854e0e823d
 
 jobs:
   build:
