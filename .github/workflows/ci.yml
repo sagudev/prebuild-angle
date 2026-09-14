@@ -33,7 +33,8 @@ jobs:
           cd angle
           git checkout ${{ env.COMMIT }}
           gclient sync --no-history
-      - run: |
+      - working-directory: angle
+        run: |
           gn gen out/Release --args='
             is_debug=false
             angle_build_all=false
@@ -51,15 +52,10 @@ jobs:
             angle_enable_abseil=false
             angle_enable_share_context_lock=true
             treat_warnings_as_errors = false
-            cflags = [
-              "-Wno-unsafe-buffer-usage",
-            ]
-            cflags_cc = [
-              "-Wno-unsafe-buffer-usage",
-            ]
             is_component_build=false'
-        working-directory: angle
       - run: autoninja -C out/Release angle angle_static
+        working-directory: angle
+      - run: autoninja -C out/Release angle_static
         working-directory: angle
       - shell: bash
         run: ls -la angle/out/Release
