@@ -18,7 +18,7 @@ jobs:
           - { target: aarch64-apple-darwin, os: macos-15 }
           - { target: x86_64-apple-darwin, os: macos-15-intel }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { target: x86_64-pc-windows-msvc, os: windows-2022 }
     runs-on: ${{ matrix.platform.os }}
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
@@ -63,8 +63,6 @@ jobs:
         working-directory: angle
       - shell: bash
         run: ls -la angle/out/Release
-      - shell: bash
-        run: tree angle/out/Release
       - name: Package windows
         if: ${{ contains(matrix.platform.os, 'windows') }}
         working-directory: angle/out/Release
@@ -74,12 +72,12 @@ jobs:
         if: ${{ contains(matrix.platform.os, 'ubuntu') }}
         working-directory: angle/out/Release
         run: |
-          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.so libGLESv2.so
+          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.so libGLESv1_CM.so libGLESv2.so
       - name: Package mac
         if: ${{ contains(matrix.platform.os, 'mac') }}
         working-directory: angle/out/Release
         run: |
-          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.dylib libGLESv2.dylib
+          zip ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}.zip libEGL.dylib libGLESv1_CM.dylib libGLESv2.dylib
       - uses: actions/upload-artifact@v4
         with:
           name: ANGLE-${{ env.COMMIT }}-${{ matrix.platform.target }}
